@@ -1,0 +1,45 @@
+name: devcontainer
+
+services:
+  workspace:
+    image: ghcr.io/yukisakai1209/ds-env:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER_UID: "1001"
+        USER_GID: "1001"
+        USERNAME: vscode
+    volumes:
+      - type: bind
+        source: ${HOME}/.ssh
+        target: /home/vscode/.ssh
+      - type: bind
+        source: ${HOME}/.codeium
+        target: /home/vscode/.codeium
+    devices:
+      - /dev/fuse
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    command: |
+      /bin/sh -c "
+      chmod 600 /home/vscode/.ssh/id_rsa &&
+      mkdir -p /home/vscode/vermeer &&
+      mkdir -p /home/vscode/magritte &&
+      mkdir -p /home/vscode/chagall &&
+      mkdir -p /home/vscode/picasso &&
+      mkdir -p /home/vscode/ncd &&
+      mkdir -p /home/vscode/xnef-data1 &&
+      mkdir -p /home/vscode/xnef-data2 &&
+      sshfs yuki1209@ncd-node01g:/home/vermeer/yuki1209 /home/vscode/vermeer -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 &&
+      sshfs yuki1209@ncd-node02g:/home/magritte/yuki1209 /home/vscode/magritte -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 &&
+      sshfs yuki1209@ncd-node03g:/home/chagall/yuki1209 /home/vscode/chagall -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 &&
+      sshfs yuki1209@ncd-node04g:/home/picasso/yuki1209 /home/vscode/picasso -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 &&
+      sshfs yuki1209@ncd-node05g:/home/ncd/yuki1209 /home/vscode/ncd -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 &&
+      sshfs yuki1209@ncd-node06g:/home/xnef-data1/yuki1209 /home/vscode/xnef-data1 -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 &&
+      sshfs yuki1209@ncd-node07g:/home/xnef-data2/yuki1209 /home/vscode/xnef-data2 -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 &&
+      sleep infinity"
+
+volumes: {}

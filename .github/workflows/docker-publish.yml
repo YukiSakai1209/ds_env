@@ -1,0 +1,40 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.devcontainer/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set date
+        id: date
+        run: echo "date=$(date +'%Y.%m.%d')" >> $GITHUB_OUTPUT
+      
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./.devcontainer
+          file: ./.devcontainer/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/yukisakai1209/ds_env:latest
+            ghcr.io/yukisakai1209/ds_env:v${{ steps.date.outputs.date }}
+            

@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Jupyter
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Logs
+*.log
+devcontainer_*.log
+
+# Project specific private files
+docs/
+Instruction.md
+
+# Data and Archives
+data/
+test/
+!data/.gitkeep
+!data/README.md
+!data/metadata/
+!data/schemas/
+
+archives/
+!archives/.gitkeep
+!archives/README.md
+
+# Large files
+*.nii.gz
+*.dcm
+*.mat
