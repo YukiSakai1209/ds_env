@@ -20,7 +20,7 @@ The following libraries are included in this environment:
 Please ensure that you have the correct versions installed for compatibility.
 
 
-## Logging into GHCR, Pulling the Docker Image, and Testing the Environment in Remote Computing Servers
+## Logging into GHCR, Pulling the Docker Image, and Testing the Environment
 
 To use the Docker image, follow these steps:
 
