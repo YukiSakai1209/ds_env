@@ -19,6 +19,7 @@ RUN usermod -u 1001 vscode \
     && chown -R vscode:vscode /home/vscode \
     && mkdir -p /home/vscode/.ssh \
     && mkdir -p /home/vscode/vermeer/container_envs \
+    && mkdir -p /home/vscode/vermeer/ds_env \
     && mkdir -p /home/vscode/.config/Windsurf/logs \
     && mkdir -p /home/vscode/.windsurf \
     && chown -R vscode:vscode /home/vscode/.ssh \

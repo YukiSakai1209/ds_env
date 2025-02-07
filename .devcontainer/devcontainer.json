@@ -3,6 +3,12 @@
     "dockerComposeFile": "docker-compose.yml",
     "service": "workspace",
     "workspaceFolder": "/home/vscode/vermeer/envs/ds_env",
+    "forwardPorts": [
+        3000,
+        5173,
+        5432,
+        8080
+    ],
     "customizations": {
         "vscode": {
             "extensions": [
