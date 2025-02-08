@@ -37,7 +37,7 @@
     "remoteUser": "vscode",
     "containerUser": "vscode",
     "updateRemoteUserUID": true,
-    "postCreateCommand": "mkdir -p /home/vscode/vermeer/envs/container_envs && chown -R vscode:vscode /home/vscode/vermeer && mkdir -p /home/vscode/.windsurf/logs && chown -R vscode:vscode /home/vscode/.windsurf && chmod -R 755 /home/vscode/.windsurf && conda activate research",
+    "postCreateCommand": "mkdir -p /home/vscode/vermeer/envs/ds_env && chown -R vscode:vscode /home/vscode/vermeer && mkdir -p /home/vscode/.windsurf/logs && chown -R vscode:vscode /home/vscode/.windsurf && chmod -R 755 /home/vscode/.windsurf && conda activate research",
     "mounts": [
         "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
         "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
