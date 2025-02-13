@@ -20,9 +20,6 @@ wheels/
 .installed.cfg
 *.egg
 
-# R
-anovakun*
-
 # IDE
 .idea/
 .vscode/
