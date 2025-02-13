@@ -38,11 +38,32 @@ ENV DEBUG=true \
     WINDSURF_LOG_LEVEL=trace \
     WINDSURF_EXTENSION_LOG_LEVEL=trace
 
-# Copy environment.yml and create conda environment
-COPY environment.yml /tmp/environment.yml
-RUN conda env create -f /tmp/environment.yml \
-    && conda clean -a -y \
-    && rm -rf /tmp/environment.yml
+# Initialize shell for conda
+SHELL ["/bin/bash", "-c"]
+
+# Copy all environment files
+COPY environment*.yml /tmp/
+
+# Create research environment
+RUN conda env create -p /opt/conda/envs/research -f /tmp/environment.yml \
+    && conda clean -a -y
+
+# Create DynamicViz environment
+RUN conda env create -p /opt/conda/envs/dynamicviz -f /tmp/environment_dynamicviz.yml \
+    && conda clean -a -y
+
+# Create R environment
+RUN conda env create -p /opt/conda/envs/r_env -f /tmp/environment_r.yml \
+    && conda clean -a -y
+
+# Install R packages in r_env
+RUN /opt/conda/envs/r_env/bin/Rscript -e "devtools::install_github('pmartinezarbizu/pairwiseAdonis/pairwiseAdonis')"
+COPY anovakun_489.txt /tmp/
+RUN /opt/conda/envs/r_env/bin/Rscript -e "source('/tmp/anovakun_489.txt', encoding = 'CP932')"
+
+# Clean up
+RUN rm -f /tmp/environment*.yml
+RUN rm -f /tmp/anovakun_489.txt
 
 # Initialize shell for conda
 RUN conda init bash \
@@ -58,7 +79,10 @@ RUN conda init bash \
 # Set default shell to bash
 ENV SHELL=/bin/bash
 
-# Make sure the vscode user owns its home directory and the conda environment
-RUN chown -R vscode:vscode /home/vscode /opt/conda/envs/research
+# Make sure the vscode user owns all environments
+RUN chown -R vscode:vscode /home/vscode \
+    && chown -R vscode:vscode /opt/conda/envs/research \
+    && chown -R vscode:vscode /opt/conda/envs/dynamicviz \
+    && chown -R vscode:vscode /opt/conda/envs/r_env
 
 USER $USERNAME

@@ -13,21 +13,14 @@
         "vscode": {
             "extensions": [
                 "ms-python.python",
-                "ms-python.vscode-pylance",
-                "ms-toolsai.jupyter",
-                "ms-toolsai.jupyter-renderers",
-                "charliermarsh.ruff",
                 "njpwerner.autodocstring",
                 "eamodio.gitlens",
                 "github.vscode-github-actions",
-                "github.copilot",
-                "github.copilot-chat",
                 "MS-CEINTL.vscode-language-pack-ja"
             ],
             "settings": {
                 "python.defaultInterpreterPath": "/opt/conda/envs/research/bin/python",
                 "python.formatting.provider": "none",
-                "python.languageServer": "Pylance",
                 "python.analysis.typeCheckingMode": "basic",
                 "python.linting.enabled": true,
                 "python.linting.pylintEnabled": true
