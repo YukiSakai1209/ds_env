@@ -28,9 +28,7 @@
         }
     },
     "remoteUser": "vscode",
-    "containerUser": "vscode",
-    "updateRemoteUserUID": true,
-    "postCreateCommand": "mkdir -p /home/vscode/vermeer/envs/ds_env && chown -R vscode:vscode /home/vscode/vermeer && mkdir -p /home/vscode/.windsurf/logs && chown -R vscode:vscode /home/vscode/.windsurf && chmod -R 755 /home/vscode/.windsurf && conda activate research",
+    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y sudo && sudo usermod -aG sudo vscode && echo 'vscode ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/vscode && sudo mkdir -p /home/vscode/vermeer/envs/ds_env && sudo chown -R vscode:vscode /home/vscode/vermeer && sudo chmod -R 755 /home/vscode/vermeer",
     "mounts": [
         "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
         "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",

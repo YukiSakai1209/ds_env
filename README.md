@@ -42,6 +42,25 @@ This project utilizes the following Conda environments.
   - r-lmerTest
   - Other libraries (see file for details)
 
+### 4. TensorFlow GPU Environment
+
+- Environment Name: `tf_gpu`
+- Configuration: Created using Conda with Python 3.11.
+- Key Dependencies:
+  - TensorFlow 2.18.0
+  - TensorFlow Probability 0.25.0
+  - Additional dependencies from `latest_requirements.txt`.
+
+### 5. PyTorch GPU Environment
+
+- Environment Name: `torch_gpu`
+- Configuration: Created using Conda with Python 3.11.
+- Key Dependencies:
+  - PyTorch 2.5.1
+  - torchvision 0.20.1
+  - torchaudio 2.5.1
+  - Additional dependencies from `latest_requirements.txt`
+
 This ensures that the necessary libraries are installed in the respective environments.
 
 ## Logging into GHCR, Pulling the Docker Image, and Testing the Environment
