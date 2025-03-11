@@ -30,6 +30,7 @@ ENV PATH=/opt/conda/bin:$PATH
 # Create the user and necessary directories
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && usermod -aG sudo $USERNAME \
     && chown -R $USERNAME:$USERNAME /home/$USERNAME \
     && mkdir -p /home/$USERNAME/.ssh \
     && mkdir -p /home/$USERNAME/vermeer/envs/ds_env \
