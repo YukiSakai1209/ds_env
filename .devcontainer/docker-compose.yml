@@ -35,13 +35,13 @@ services:
       mkdir -p /home/vscode/ncd &&
       mkdir -p /home/vscode/xnef-data1 &&
       mkdir -p /home/vscode/xnef-data2 &&
-      sshfs yuki1209@ncd-node01g:/home/vermeer/yuki1209 /home/vscode/vermeer -o allow_other -o default_permissions -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 &&
-      sshfs yuki1209@ncd-node02g:/home/magritte/yuki1209 /home/vscode/magritte -o allow_other -o default_permissions -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 &&
-      sshfs yuki1209@ncd-node03g:/home/chagall/yuki1209 /home/vscode/chagall -o allow_other -o default_permissions -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 &&
-      sshfs yuki1209@ncd-node04g:/home/picasso/yuki1209 /home/vscode/picasso -o allow_other -o default_permissions -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 &&
-      sshfs yuki1209@ncd-node05g:/home/ncd/yuki1209 /home/vscode/ncd -o allow_other -o default_permissions -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 &&
-      sshfs yuki1209@ncd-node06g:/home/xnef-data1/yuki1209 /home/vscode/xnef-data1 -o allow_other -o default_permissions -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 &&
-      sshfs yuki1209@ncd-node07g:/home/xnef-data2/yuki1209 /home/vscode/xnef-data2 -o allow_other -o default_permissions -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 &&
+      sshfs yuki1209@ncd-node01g:/home/vermeer/yuki1209 /home/vscode/vermeer -o allow_other -o default_permissions -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 -o uid=1001 -o gid=1001 &&
+      sshfs yuki1209@ncd-node02g:/home/magritte/yuki1209 /home/vscode/magritte -o allow_other -o default_permissions -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 -o uid=1001 -o gid=1001 &&
+      sshfs yuki1209@ncd-node03g:/home/chagall/yuki1209 /home/vscode/chagall -o allow_other -o default_permissions -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 -o uid=1001 -o gid=1001 &&
+      sshfs yuki1209@ncd-node04g:/home/picasso/yuki1209 /home/vscode/picasso -o allow_other -o default_permissions -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 -o uid=1001 -o gid=1001 &&
+      sshfs yuki1209@ncd-node05g:/home/ncd/yuki1209 /home/vscode/ncd -o allow_other -o default_permissions -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 -o uid=1001 -o gid=1001 &&
+      sshfs yuki1209@ncd-node06g:/home/xnef-data1/yuki1209 /home/vscode/xnef-data1 -o allow_other -o default_permissions -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 -o uid=1001 -o gid=1001 &&
+      sshfs yuki1209@ncd-node07g:/home/xnef-data2/yuki1209 /home/vscode/xnef-data2 -o allow_other -o default_permissions -o reconnect -o ServerAliveInterval=15 -o ServerAliveCountMax=3 -o uid=1001 -o gid=1001 &&
       sleep infinity"
     environment:
       - NVIDIA_DISABLE_REQUIRE=true
