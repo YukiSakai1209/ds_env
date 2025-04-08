@@ -16,6 +16,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     curl \
     libgl1-mesa-dev \
     libglib2.0-0 \
+    libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev \
+    libsdl1.2-dev libsmpeg-dev libportmidi-dev ffmpeg libswscale-dev \
+    libavformat-dev libavcodec-dev swig \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js and npm
@@ -79,6 +82,15 @@ COPY latest_requirements.txt /tmp/
 # Create research environment
 RUN conda env create -p /opt/conda/envs/research -f /tmp/environment.yml \
     && conda clean -a -y
+SHELL ["conda", "run", "-n", "research", "/bin/bash", "-c"]
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+RUN pip install --no-cache-dir cupy-cuda12x
+# Upgrade grpcio using pip to satisfy Optuna's requirement (dependency via CuPy -> Optuna)
+RUN pip install --no-cache-dir --upgrade "grpcio>=1.68.1"
+
+# Reset shell back to bash
+SHELL ["/bin/bash", "-c"]
 
 # Create DynamicViz environment
 RUN conda env create -p /opt/conda/envs/dynamicviz -f /tmp/environment_dynamicviz.yml \
@@ -94,22 +106,22 @@ COPY anovakun_489.txt /tmp/
 RUN /opt/conda/envs/r_env/bin/Rscript -e "source('/tmp/anovakun_489.txt', encoding = 'CP932')"
 
 # TensorFlow GPU env
-RUN conda create -y -p /opt/conda/envs/tf_gpu python=3.11
-# Make RUN commands use the new environment (instead of conda activate):
-SHELL ["conda", "run", "-n", "tf_gpu", "/bin/bash", "-c"]
-RUN pip install --ignore-installed blinker==1.8.2 \
-    && pip install tensorflow-probability==0.25.0 \
-    && pip install tensorflow==2.18.0 \
-    && pip install -U -r /tmp/latest_requirements.txt \
-    && conda clean -a -y
+# RUN conda create -y -p /opt/conda/envs/tf_gpu python=3.11
+# # Make RUN commands use the new environment (instead of conda activate):
+# SHELL ["conda", "run", "-n", "tf_gpu", "/bin/bash", "-c"]
+# RUN pip install --ignore-installed blinker==1.8.2 \
+#     && pip install tensorflow-probability==0.25.0 \
+#     && pip install tensorflow==2.18.0 \
+#     && pip install -U -r /tmp/latest_requirements.txt \
+#     && conda clean -a -y
 
 # PyTorch GPU
-RUN conda create -y -p /opt/conda/envs/torch_gpu python=3.11
-# Make RUN commands use the new environment (instead of conda activate):
-SHELL ["conda", "run", "-n", "torch_gpu", "/bin/bash", "-c"]
-RUN conda install pytorch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 pytorch-cuda=12.4 -c pytorch -c nvidia \
-    && pip install -U -r /tmp/latest_requirements.txt \
-    && conda clean -a -y
+# RUN conda create -y -p /opt/conda/envs/torch_gpu python=3.11
+# # Make RUN commands use the new environment (instead of conda activate):
+# SHELL ["conda", "run", "-n", "torch_gpu", "/bin/bash", "-c"]
+# RUN conda install pytorch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 pytorch-cuda=12.4 -c pytorch -c nvidia \
+#     && pip install -U -r /tmp/latest_requirements.txt \
+#     && conda clean -a -y
 
 # Clean up
 RUN rm -f /tmp/environment*.yml
@@ -137,7 +149,7 @@ RUN conda init bash \
     && echo 'fi' >> /home/$USERNAME/.bashrc \
     && chown vscode:vscode /home/vscode/.bashrc
 
-# NVIDIAエントリポイントスクリプトとCUDA環境変数の追加
+# Add NVIDIA entrypoint script and CUDA environment variables
 RUN mkdir -p /opt/nvidia && \
     echo '#!/bin/bash' > /opt/nvidia/nvidia_entrypoint.sh && \
     echo 'set -e' >> /opt/nvidia/nvidia_entrypoint.sh && \
@@ -159,9 +171,9 @@ ENV SHELL=/bin/bash
 RUN chown -R vscode:vscode /home/vscode \
     && chown -R vscode:vscode /opt/conda/envs/research \
     && chown -R vscode:vscode /opt/conda/envs/dynamicviz \
-    && chown -R vscode:vscode /opt/conda/envs/r_env \
-    && chown -R vscode:vscode /opt/conda/envs/tf_gpu \
-    && chown -R vscode:vscode /opt/conda/envs/torch_gpu
+    && chown -R vscode:vscode /opt/conda/envs/r_env
+    # && chown -R vscode:vscode /opt/conda/envs/tf_gpu
+    # && chown -R vscode:vscode /opt/conda/envs/torch_gpu
 
 # Create necessary directories with proper permissions
 RUN mkdir -p /home/vscode/vermeer/envs/ds_env \
