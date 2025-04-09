@@ -203,9 +203,7 @@ dependencies:
   - gto=1.7.2=pyhd8ed1ab_1
   - gts=0.7.6=h977cf35_4
   - gunicorn=23.0.0=py310hff52083_1
-  - gym=0.26.1=py310hfdc917e_0
-  - gym-notices=0.0.8=pyhd8ed1ab_1
-  - gymnasium=1.0.0=py310hb7f781d_1
+  - gymnasium=1.0.0
   - h11=0.14.0=pyhd8ed1ab_1
   - h2=4.2.0=pyhd8ed1ab_0
   - h5py=3.12.1=nompi_py310hacc6608_103
@@ -752,7 +750,8 @@ dependencies:
       - templateflow==24.2.2
       - teneto==0.5.3
       - universal-pathlib==0.2.6
-      - mushroom_rl==1.10.1
+      # - mushroom_rl==1.10.1
+      - git+https://github.com/MushroomRL/mushroom-rl.git@dev#egg=mushroom-rl # dev branch
       - acres==0.3.0
       - ale-py==0.7.5
       - Pillow
@@ -761,3 +760,4 @@ dependencies:
       - dm_control>=1.0.9
       - box2d-py~=2.3.5
       - pyqtgraph
+      
