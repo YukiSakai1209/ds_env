@@ -84,7 +84,9 @@ RUN conda env create -p /opt/conda/envs/research -f /tmp/environment.yml \
     && conda clean -a -y
 SHELL ["conda", "run", "-n", "research", "/bin/bash", "-c"]
 RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+RUN pip install -vvv --no-cache-dir torch --index-url https://download.pytorch.org/whl/cu121
+RUN pip install -vvv --no-cache-dir torchvision --index-url https://download.pytorch.org/whl/cu121
+RUN pip install -vvv --no-cache-dir torchaudio --index-url https://download.pytorch.org/whl/cu121
 RUN pip install --no-cache-dir cupy-cuda12x
 # Upgrade grpcio using pip to satisfy Optuna's requirement (dependency via CuPy -> Optuna)
 RUN pip install --no-cache-dir --upgrade "grpcio>=1.68.1"
