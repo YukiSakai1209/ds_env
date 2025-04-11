@@ -3,6 +3,7 @@ FROM nvidia/cuda:12.5.1-cudnn-devel-ubuntu22.04
 ARG USERNAME=vscode
 ARG USER_UID=1001
 ARG USER_GID=1001
+ARG WORK_DIR=/home/${USERNAME}/vermeer/envs/ds_env
 
 # Install basic dependencies and SSHFS
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -19,6 +20,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev \
     libsdl1.2-dev libsmpeg-dev libportmidi-dev ffmpeg libswscale-dev \
     libavformat-dev libavcodec-dev swig \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js and npm
@@ -28,6 +30,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && node -v \
     && npm -v \
     && npx -v
+
+# Clean up
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install miniconda
 RUN curl -fsSLo /tmp/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
@@ -44,16 +49,14 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && usermod -aG sudo $USERNAME \
     && chown -R $USERNAME:$USERNAME /home/$USERNAME \
     && mkdir -p /home/$USERNAME/.ssh \
-    && mkdir -p /home/$USERNAME/vermeer/envs/ds_env \
-    && mkdir -p /home/$USERNAME/.config/Windsurf/logs \
-    && mkdir -p /home/$USERNAME/.windsurf \
+    && mkdir -p ${WORK_DIR} \
+    && mkdir -p /home/$USERNAME/.config \
     && chown -R $USERNAME:$USERNAME /home/$USERNAME/.ssh \
     && chown -R $USERNAME:$USERNAME /home/$USERNAME/vermeer \
     && chown -R $USERNAME:$USERNAME /home/$USERNAME/.config \
-    && chown -R $USERNAME:$USERNAME /home/$USERNAME/.windsurf \
-    && chmod -R 755 /home/$USERNAME/.config/Windsurf/logs \
+    && chmod -R 755 /home/$USERNAME/.config \
     && chmod -R 755 /home/$USERNAME/vermeer \
-    && chmod -R 755 /home/$USERNAME/vermeer/envs/ds_env
+    && chmod -R 755 ${WORK_DIR}
 
 # Add FUSE device access
 RUN echo "user_allow_other" >> /etc/fuse.conf
@@ -67,10 +70,7 @@ RUN conda init bash \
 
 # Add environment variables for debugging
 ENV DEBUG=true \
-    VERBOSE_LOGGING=true \
-    WINDSURF_DEBUG=true \
-    WINDSURF_LOG_LEVEL=trace \
-    WINDSURF_EXTENSION_LOG_LEVEL=trace
+    VERBOSE_LOGGING=true
 
 # Initialize shell for conda
 SHELL ["/bin/bash", "-c"]
@@ -81,13 +81,19 @@ COPY latest_requirements.txt /tmp/
 
 # Create research environment
 RUN conda env create -p /opt/conda/envs/research -f /tmp/environment.yml \
-    && conda clean -a -y
+    && conda clean -a -y --force
 SHELL ["conda", "run", "-n", "research", "/bin/bash", "-c"]
 RUN pip install --no-cache-dir --upgrade pip
-RUN pip install -vvv --no-cache-dir torch --index-url https://download.pytorch.org/whl/cu121
-RUN pip install -vvv --no-cache-dir torchvision --index-url https://download.pytorch.org/whl/cu121
-RUN pip install -vvv --no-cache-dir torchaudio --index-url https://download.pytorch.org/whl/cu121
-RUN pip install --no-cache-dir cupy-cuda12x
+RUN rm -rf /root/.cache/pip && rm -rf /home/${USERNAME}/.cache/pip
+RUN conda run -n research pip install -vvv --no-cache-dir torch --index-url https://download.pytorch.org/whl/cu121 \
+    && rm -rf /root/.cache/pip && rm -rf /home/${USERNAME}/.cache/pip
+# Deleted because it cannot be built in a CI environment with the GitHub workflow. If it becomes necessary to use Atari, etc. in the future, consider using the torch_gpu environment dedicated to PyTorch, which has been prepared separately.
+# RUN conda run -n research pip install -vvv --no-cache-dir torchvision --index-url https://download.pytorch.org/whl/cu121 \
+#     && rm -rf /root/.cache/pip && rm -rf /home/${USERNAME}/.cache/pip
+# RUN conda run -n research pip install -vvv --no-cache-dir torchaudio --index-url https://download.pytorch.org/whl/cu121 \
+#     && rm -rf /root/.cache/pip && rm -rf /home/${USERNAME}/.cache/pip
+RUN conda run -n research pip install --no-cache-dir cupy-cuda12x \
+    && rm -rf /root/.cache/pip && rm -rf /home/${USERNAME}/.cache/pip
 # Upgrade grpcio using pip to satisfy Optuna's requirement (dependency via CuPy -> Optuna)
 RUN pip install --no-cache-dir --upgrade "grpcio>=1.68.1"
 
@@ -96,11 +102,11 @@ SHELL ["/bin/bash", "-c"]
 
 # Create DynamicViz environment
 RUN conda env create -p /opt/conda/envs/dynamicviz -f /tmp/environment_dynamicviz.yml \
-    && conda clean -a -y
+    && conda clean -a -y --force
 
 # Create R environment
 RUN conda env create -p /opt/conda/envs/r_env -f /tmp/environment_r.yml \
-    && conda clean -a -y
+    && conda clean -a -y --force
 
 # Install R packages in r_env
 RUN /opt/conda/envs/r_env/bin/Rscript -e "devtools::install_github('pmartinezarbizu/pairwiseAdonis/pairwiseAdonis')"
@@ -139,13 +145,10 @@ RUN conda init bash \
     && echo "conda activate research" >> /home/vscode/.bashrc \
     && echo 'export DEBUG=true' >> /home/vscode/.bashrc \
     && echo 'export VERBOSE_LOGGING=true' >> /home/vscode/.bashrc \
-    && echo 'export WINDSURF_DEBUG=true' >> /home/vscode/.bashrc \
-    && echo 'export WINDSURF_LOG_LEVEL=trace' >> /home/vscode/.bashrc \
-    && echo 'export WINDSURF_EXTENSION_LOG_LEVEL=trace' >> /home/vscode/.bashrc \
-    && echo 'if [ -f /home/vscode/vermeer/envs/ds_env/.env ]; then' >> /home/$USERNAME/.bashrc \
-    && echo '    source /home/vscode/vermeer/envs/ds_env/.env' >> /home/$USERNAME/.bashrc \
-    && echo 'fi' >> /home/$USERNAME/.bashrc \
-    && echo 'export NVIDIA_ENTRYPOINT=/home/vscode/vermeer/envs/ds_env/entrypoint.sh' >> /home/$USERNAME/.bashrc \
+    && echo "if [ -f ${WORK_DIR}/.env ]; then" >> /home/$USERNAME/.bashrc \
+    && echo "    source ${WORK_DIR}/.env" >> /home/$USERNAME/.bashrc \
+    && echo "fi" >> /home/$USERNAME/.bashrc \
+    && echo "export NVIDIA_ENTRYPOINT=${WORK_DIR}/entrypoint.sh" >> /home/$USERNAME/.bashrc \
     && echo 'if [ -f "$NVIDIA_ENTRYPOINT" ]; then' >> /home/$USERNAME/.bashrc \
     && echo '    source "$NVIDIA_ENTRYPOINT"' >> /home/$USERNAME/.bashrc \
     && echo 'fi' >> /home/$USERNAME/.bashrc \
@@ -178,11 +181,12 @@ RUN chown -R vscode:vscode /home/vscode \
     # && chown -R vscode:vscode /opt/conda/envs/torch_gpu
 
 # Create necessary directories with proper permissions
-RUN mkdir -p /home/vscode/vermeer/envs/ds_env \
-    && chown -R vscode:vscode /home/vscode/vermeer \
+RUN mkdir -p ${WORK_DIR} \
+    && chown -R vscode:vscode /home/vscode \
+    && chmod -R 755 /home/vscode \
     && chmod -R 755 /home/vscode/vermeer \
     && chmod -R 755 /home/vscode/vermeer/envs \
-    && chmod -R 755 /home/vscode/vermeer/envs/ds_env
+    && chmod -R 755 ${WORK_DIR}
 
 # Set default shell to bash
 ENV SHELL=/bin/bash
@@ -191,4 +195,4 @@ ENV SHELL=/bin/bash
 USER vscode
 
 # Working directory
-WORKDIR /home/vscode/vermeer/envs/ds_env
+WORKDIR ${WORK_DIR}
