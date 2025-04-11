@@ -4,7 +4,6 @@ ARG USERNAME=vscode
 ARG USER_UID=1001
 ARG USER_GID=1001
 ARG WORK_DIR=/home/${USERNAME}/vermeer/envs/ds_env
-ARG WORK_DIR=/home/${USERNAME}/vermeer/envs/ds_env
 
 # Install basic dependencies and SSHFS
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
