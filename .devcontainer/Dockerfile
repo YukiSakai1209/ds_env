@@ -148,11 +148,7 @@ RUN conda init bash \
     && echo "if [ -f ${WORK_DIR}/.env ]; then" >> /home/$USERNAME/.bashrc \
     && echo "    source ${WORK_DIR}/.env" >> /home/$USERNAME/.bashrc \
     && echo "fi" >> /home/$USERNAME/.bashrc \
-    && echo "export NVIDIA_ENTRYPOINT=${WORK_DIR}/entrypoint.sh" >> /home/$USERNAME/.bashrc \
-    && echo 'if [ -f "$NVIDIA_ENTRYPOINT" ]; then' >> /home/$USERNAME/.bashrc \
-    && echo '    source "$NVIDIA_ENTRYPOINT"' >> /home/$USERNAME/.bashrc \
-    && echo 'fi' >> /home/$USERNAME/.bashrc \
-    && chown vscode:vscode /home/vscode/.bashrc
+    && chown vscode:vscode /home/vscode/.bashrc        
 
 # Add NVIDIA entrypoint script and CUDA environment variables
 RUN mkdir -p /opt/nvidia && \
@@ -191,8 +187,16 @@ RUN mkdir -p ${WORK_DIR} \
 # Set default shell to bash
 ENV SHELL=/bin/bash
 
+# Copy and set permissions for the entrypoint wrapper
+COPY entrypoint_wrapper.sh /usr/local/bin/entrypoint_wrapper.sh
+RUN chmod +x /usr/local/bin/entrypoint_wrapper.sh
+
 # Switch to vscode user
 USER vscode
+
+# Copy SSH config to enable legacy algorithms for specific hosts
+COPY --chown=vscode:vscode ssh_config /home/vscode/.ssh/config
+RUN chmod 600 /home/vscode/.ssh/config
 
 # Working directory
 WORKDIR ${WORK_DIR}

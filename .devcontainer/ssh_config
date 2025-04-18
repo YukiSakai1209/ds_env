@@ -1,0 +1,5 @@
+Host magritte chagall picasso xnef-node01g cns-node01g
+    HostName %h # %h は Host 行で指定された名前 (magritte など) を使う意味
+    User yuki1209
+    HostkeyAlgorithms +ssh-rsa
+    PubkeyAcceptedKeyTypes +ssh-rsa
