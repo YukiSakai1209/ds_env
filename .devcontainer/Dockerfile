@@ -23,6 +23,34 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Set up locale to avoid R/rpy2 warnings
+RUN apt-get update && apt-get install -y --no-install-recommends locales \
+    && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
+    && locale-gen en_US.UTF-8 \
+    && update-locale LANG=en_US.UTF-8 \
+    && rm -rf /var/lib/apt/lists/*
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
+# Install essential packages, sudo, git, SSH client, curl, etc.
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    git \
+    build-essential \
+    sshfs \
+    openssh-client \
+    fuse3 \
+    wget \
+    ca-certificates \
+    curl \
+    libgl1-mesa-dev \
+    libglib2.0-0 \
+    libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev \
+    libsdl1.2-dev libsmpeg-dev libportmidi-dev ffmpeg libswscale-dev \
+    libavformat-dev libavcodec-dev swig \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install Node.js and npm
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
@@ -76,8 +104,10 @@ ENV DEBUG=true \
 SHELL ["/bin/bash", "-c"]
 
 # Copy all environment files
-COPY environment*.yml /tmp/
-COPY latest_requirements.txt /tmp/
+COPY environment.yml /tmp/environment.yml
+COPY environment_dynamicviz.yml /tmp/environment_dynamicviz.yml
+COPY environment_r.yml /tmp/environment_r.yml
+COPY latest_requirements.txt /tmp/latest_requirements.txt
 
 # Create research environment
 RUN conda env create -p /opt/conda/envs/research -f /tmp/environment.yml \
@@ -104,12 +134,36 @@ SHELL ["/bin/bash", "-c"]
 RUN conda env create -p /opt/conda/envs/dynamicviz -f /tmp/environment_dynamicviz.yml \
     && conda clean -a -y --force
 
-# Create R environment
+# Create R environment using the updated environment file
+COPY environment_r.yml /tmp/environment_r.yml
 RUN conda env create -p /opt/conda/envs/r_env -f /tmp/environment_r.yml \
-    && conda clean -a -y --force
+    && conda clean -a -y --force \
+    && rm /tmp/environment_r.yml
 
-# Install R packages in r_env
-RUN /opt/conda/envs/r_env/bin/Rscript -e "devtools::install_github('pmartinezarbizu/pairwiseAdonis/pairwiseAdonis')"
+# Activate env and install R kernel spec system-wide using conda run
+RUN conda run -n r_env R -e "IRkernel::installspec(user = FALSE)"
+
+# Install rpy2 using pip as a workaround for conda dependency issues
+RUN conda run -n r_env pip install --no-cache-dir rpy2
+
+# Install system dependencies potentially needed by R packages installed via Rscript/devtools
+# Kept because pairwiseAdonis/anovakun might need them and aren't installed via conda
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libssl-dev \
+    libcurl4-openssl-dev \
+    libxml2-dev \
+    libfontconfig1-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    libtiff5-dev \
+    libjpeg-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install R packages not available via conda (ensure r-devtools is in environment_r.yml)
+# Added CRAN repo option and upgrade='never' for install_github
+RUN /opt/conda/envs/r_env/bin/Rscript -e "options(repos = c(CRAN = 'https://cloud.r-project.org')); devtools::install_github('pmartinezarbizu/pairwiseAdonis/pairwiseAdonis', upgrade = 'never')"
 COPY anovakun_489.txt /tmp/
 RUN /opt/conda/envs/r_env/bin/Rscript -e "source('/tmp/anovakun_489.txt', encoding = 'CP932')"
 
@@ -191,12 +245,14 @@ ENV SHELL=/bin/bash
 COPY entrypoint_wrapper.sh /usr/local/bin/entrypoint_wrapper.sh
 RUN chmod +x /usr/local/bin/entrypoint_wrapper.sh
 
+# Setup ssh config
+# Copy SSH config and set ownership directly
+COPY --chown=vscode:vscode ssh_config /home/vscode/.ssh/config
+# Ensure correct permissions
+RUN chmod 600 /home/vscode/.ssh/config
+
 # Switch to vscode user
 USER vscode
-
-# Copy SSH config to enable legacy algorithms for specific hosts
-COPY --chown=vscode:vscode ssh_config /home/vscode/.ssh/config
-RUN chmod 600 /home/vscode/.ssh/config
 
 # Working directory
 WORKDIR ${WORK_DIR}

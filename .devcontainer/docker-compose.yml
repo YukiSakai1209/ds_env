@@ -10,7 +10,6 @@ services:
         USER_UID: "1001"
         USER_GID: "1001"
         USERNAME: vscode
-    init: true
     volumes:
       # Use short syntax for volume mounts
       - ${HOME}/.ssh:/home/vscode/.ssh:ro
@@ -37,6 +36,7 @@ services:
     environment:
       - NVIDIA_DISABLE_REQUIRE=true
       - NVIDIA_VISIBLE_DEVICES=all
+      - LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
     deploy:
       resources:
         reservations:

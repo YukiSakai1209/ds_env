@@ -37,10 +37,15 @@ for mount_info in "${MOUNTS[@]}"; do
     # Use fusermount to unmount first, in case it was already mounted uncleanly
     fusermount -u "$MOUNT_POINT" > /dev/null 2>&1
 
-    if sshfs "$REMOTE" "$MOUNT_POINT" $CURRENT_SSHFS_OPTS; then
+    # Capture stderr from sshfs by redirecting it to stdout (2>&1)
+    sshfs_output=$(sshfs "$REMOTE" "$MOUNT_POINT" $CURRENT_SSHFS_OPTS 2>&1)
+    sshfs_exit_code=$?
+
+    if [ $sshfs_exit_code -eq 0 ]; then
         echo "[Entrypoint Wrapper] SSHFS mount successful for $MOUNT_POINT."
     else
-        echo "[Entrypoint Wrapper] SSHFS mount FAILED for $MOUNT_POINT. Check connection, remote path, and SSH options."
+        echo "[Entrypoint Wrapper] SSHFS mount FAILED for $MOUNT_POINT. Exit code: $sshfs_exit_code"
+        echo "[Entrypoint Wrapper] sshfs output: $sshfs_output"
         # Consider adding a sleep or retry mechanism if needed
     fi
     # Add a small delay between mounts if issues persist
@@ -49,6 +54,6 @@ done
 
 echo "[Entrypoint Wrapper] All mount attempts finished."
 
-# Execute the original command passed to the entrypoint (e.g., sleep infinity)
-echo "[Entrypoint Wrapper] Executing original command: $@"
+# Execute the command passed to the container (e.g., sleep infinity or the command from docker exec)
+echo "[Entrypoint Wrapper] Executing command: $@"
 exec "$@"
