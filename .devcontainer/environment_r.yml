@@ -4,7 +4,7 @@ channels:
   - defaults
 dependencies:
   # Python core and management
-  - python=3.12
+  - python=3.12.10=h9e4cc4f_0_cpython
   - pip
   - python-dotenv
   - python_abi=3.12 # Match python version
@@ -135,7 +135,7 @@ dependencies:
   - libzlib # Explicitly keep, alias for zlib?
   - make
   - markupsafe
-  - matplotlib-inline
+  - matplotlib-base=3.10.1=py312hd3ec401_0
   - mistune
   - nbclient
   - nbconvert # Keep explicit nbconvert
@@ -243,14 +243,13 @@ dependencies:
   - joblib
   - kiwisolver
   - locket
-  - matplotlib-base
   - numexpr
-  - numpy
-  - pandas
+  - numpy=2.2.4=py312h72c5963_0
+  - pandas=2.2.3=py312hf9745cd_3
   - partd
   - pillow
   - scikit-image
-  - scikit-learn
+  - scikit-learn=1.6.1=py312h7a48858_0
   - scipy
   - seaborn-base
   - threadpoolctl
@@ -258,7 +257,7 @@ dependencies:
   - toolz
 
   # R core and packages
-  - r-base=4.4.2
+  - r-base=4.4.2=hc737e89_2
   - _r-mutex # Keep R mutex if needed
   - r-irkernel
   - r-devtools
@@ -326,7 +325,7 @@ dependencies:
   - r-gargle
   - r-generics
   - r-gert
-  - r-ggplot2
+  - r-ggplot2=3.5.2=r44hc72bb7e_0
   - r-gh
   - r-gistr
   - r-gitcreds
@@ -347,10 +346,10 @@ dependencies:
   - r-htmlwidgets
   - r-httpcode
   - r-httpuv
-  - r-httr # Keep r-httr
-  - r-httr2 # Keep r-httr2
-  - r-ids # Keep r-ids
-  - r-igraph
+  - r-httr
+  - r-httr2
+  - r-ids
+  - r-igraph=2.0.3=r44h510f1ce_1
   - r-ini # Keep r-ini
   - r-ipmisc # Keep r-ipmisc
   - r-irdisplay
@@ -383,7 +382,7 @@ dependencies:
   - r-mime
   - r-miniui
   - r-minqa
-  - r-mixomics
+  - r-mixomics=6.3.2=r44hc72bb7e_7
   - r-modelmetrics
   - r-modelr
   - r-munsell
@@ -423,7 +422,7 @@ dependencies:
   - r-rbokeh
   - r-rcmdcheck
   - r-rcolorbrewer
-  - r-rcpp
+  - r-rcpp=1.0.14=r44h93ab643_0
   - r-rcppeigen
   - r-rcppparallel
   - r-readr
@@ -501,4 +500,5 @@ dependencies:
 
   # Pip installed packages (if any, specify here)
   - pip:
+    - rpy2==3.5.17
     # - some-package==1.0.0

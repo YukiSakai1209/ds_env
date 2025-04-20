@@ -10,6 +10,7 @@ services:
         USER_UID: "1001"
         USER_GID: "1001"
         USERNAME: vscode
+    runtime: nvidia
     volumes:
       # Use short syntax for volume mounts
       - ${HOME}/.ssh:/home/vscode/.ssh:ro
@@ -30,13 +31,13 @@ services:
       - SYS_ADMIN
     security_opt:
       - apparmor:unconfined
-      - seccomp=unconfined
+      # - seccomp=unconfined # Removed to match previous version
     entrypoint: /usr/local/bin/entrypoint_wrapper.sh
     command: sleep infinity
     environment:
       - NVIDIA_DISABLE_REQUIRE=true
       - NVIDIA_VISIBLE_DEVICES=all
-      - LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+      # - LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH # Removed, rely on Dockerfile & runtime
     deploy:
       resources:
         reservations:

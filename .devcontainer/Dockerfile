@@ -115,13 +115,9 @@ RUN conda env create -p /opt/conda/envs/research -f /tmp/environment.yml \
 SHELL ["conda", "run", "-n", "research", "/bin/bash", "-c"]
 RUN pip install --no-cache-dir --upgrade pip
 RUN rm -rf /root/.cache/pip && rm -rf /home/${USERNAME}/.cache/pip
-RUN conda run -n research pip install -vvv --no-cache-dir torch --index-url https://download.pytorch.org/whl/cu121 \
+# Install specific wheel URL directly to bypass pip resolution issues
+RUN conda run -n research pip install -vvv --no-cache-dir https://download.pytorch.org/whl/cu121/torch-2.3.1%2Bcu121-cp310-cp310-linux_x86_64.whl \
     && rm -rf /root/.cache/pip && rm -rf /home/${USERNAME}/.cache/pip
-# Deleted because it cannot be built in a CI environment with the GitHub workflow. If it becomes necessary to use Atari, etc. in the future, consider using the torch_gpu environment dedicated to PyTorch, which has been prepared separately.
-# RUN conda run -n research pip install -vvv --no-cache-dir torchvision --index-url https://download.pytorch.org/whl/cu121 \
-#     && rm -rf /root/.cache/pip && rm -rf /home/${USERNAME}/.cache/pip
-# RUN conda run -n research pip install -vvv --no-cache-dir torchaudio --index-url https://download.pytorch.org/whl/cu121 \
-#     && rm -rf /root/.cache/pip && rm -rf /home/${USERNAME}/.cache/pip
 RUN conda run -n research pip install --no-cache-dir cupy-cuda12x \
     && rm -rf /root/.cache/pip && rm -rf /home/${USERNAME}/.cache/pip
 # Upgrade grpcio using pip to satisfy Optuna's requirement (dependency via CuPy -> Optuna)

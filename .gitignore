@@ -48,7 +48,7 @@ context.md
 
 # Data and Archives
 data/
-test/
+tests/
 !data/.gitkeep
 !data/README.md
 !data/metadata/
