@@ -37,7 +37,8 @@ services:
     environment:
       - NVIDIA_DISABLE_REQUIRE=true
       - NVIDIA_VISIBLE_DEVICES=all
-      # - LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH # Removed, rely on Dockerfile & runtime
+    env_file:
+      - ../.env
     deploy:
       resources:
         reservations:

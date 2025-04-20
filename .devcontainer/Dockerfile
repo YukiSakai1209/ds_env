@@ -3,7 +3,7 @@ FROM nvidia/cuda:12.5.1-cudnn-devel-ubuntu22.04
 ARG USERNAME=vscode
 ARG USER_UID=1001
 ARG USER_GID=1001
-ARG WORK_DIR=/home/${USERNAME}/vermeer/envs/ds_env
+ARG WORK_DIR=/workspace
 
 # Install basic dependencies and SSHFS
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -80,11 +80,10 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && mkdir -p ${WORK_DIR} \
     && mkdir -p /home/$USERNAME/.config \
     && chown -R $USERNAME:$USERNAME /home/$USERNAME/.ssh \
-    && chown -R $USERNAME:$USERNAME /home/$USERNAME/vermeer \
     && chown -R $USERNAME:$USERNAME /home/$USERNAME/.config \
+    && chown -R $USERNAME:$USERNAME ${WORK_DIR} \
     && chmod -R 755 /home/$USERNAME/.config \
-    && chmod -R 755 /home/$USERNAME/vermeer \
-    && chmod -R 755 ${WORK_DIR}
+    && chmod -R 775 ${WORK_DIR}
 
 # Add FUSE device access
 RUN echo "user_allow_other" >> /etc/fuse.conf
@@ -198,7 +197,7 @@ RUN conda init bash \
     && echo "if [ -f ${WORK_DIR}/.env ]; then" >> /home/$USERNAME/.bashrc \
     && echo "    source ${WORK_DIR}/.env" >> /home/$USERNAME/.bashrc \
     && echo "fi" >> /home/$USERNAME/.bashrc \
-    && chown vscode:vscode /home/vscode/.bashrc        
+    && chown vscode:vscode /home/vscode/.bashrc
 
 # Add NVIDIA entrypoint script and CUDA environment variables
 RUN mkdir -p /opt/nvidia && \
@@ -223,16 +222,12 @@ RUN chown -R vscode:vscode /home/vscode \
     && chown -R vscode:vscode /opt/conda/envs/research \
     && chown -R vscode:vscode /opt/conda/envs/dynamicviz \
     && chown -R vscode:vscode /opt/conda/envs/r_env
-    # && chown -R vscode:vscode /opt/conda/envs/tf_gpu
-    # && chown -R vscode:vscode /opt/conda/envs/torch_gpu
 
 # Create necessary directories with proper permissions
 RUN mkdir -p ${WORK_DIR} \
     && chown -R vscode:vscode /home/vscode \
     && chmod -R 755 /home/vscode \
-    && chmod -R 755 /home/vscode/vermeer \
-    && chmod -R 755 /home/vscode/vermeer/envs \
-    && chmod -R 755 ${WORK_DIR}
+    && chmod -R 775 ${WORK_DIR}
 
 # Set default shell to bash
 ENV SHELL=/bin/bash

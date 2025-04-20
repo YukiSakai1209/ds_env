@@ -2,7 +2,7 @@
     "name": "Research Environment",
     "dockerComposeFile": "docker-compose.yml",
     "service": "workspace",
-    "workspaceFolder": "/home/vscode/vermeer/envs/ds_env",
+    "workspaceFolder": "/workspace",
     "forwardPorts": [
         3000,
         5173,
@@ -27,8 +27,12 @@
             }
         }
     },
+    /* "containerEnv": {
+        "CURRENT_PROJECT_BASENAME": "${localWorkspaceFolderBasename}"
+    }, */ // Removed - Env vars loaded from .env via docker-compose
+
     "remoteUser": "vscode",
-    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y sudo && sudo usermod -aG sudo vscode && echo 'vscode ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/vscode && echo 'umask 0002' >> ~/.bashrc && sudo find /home/vscode/vermeer -type d -exec chmod 775 {} \\; || true"
+    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y sudo && sudo usermod -aG sudo vscode && echo 'vscode ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/vscode && echo 'umask 0002' >> ~/.bashrc"
     // "mounts": [
     //     "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
     //     "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached"
