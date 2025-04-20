@@ -1,4 +1,4 @@
-name: devcontainer
+name: ds-env-devcontainer
 
 services:
   workspace:
@@ -11,48 +11,32 @@ services:
         USER_GID: "1001"
         USERNAME: vscode
     runtime: nvidia
+    env_file:
+      - ../.env
     volumes:
-      # Use short syntax for volume mounts
+      # Bind mount SSH keys and config
       - ${HOME}/.ssh:/home/vscode/.ssh:ro
-      - ${HOME}/.codeium:/home/vscode/.codeium
-      # Mount SSHFS directories that are already mounted on the host
-      # - vermeer-volume:/home/vscode/vermeer
-      # - magritte-volume:/home/vscode/magritte
-      # - chagall-volume:/home/vscode/chagall
-      # - picasso-volume:/home/vscode/picasso
-      # - ncd-volume:/home/vscode/ncd
-      # - xnef-data1-volume:/home/vscode/xnef-data1
-      # - xnef-data2-volume:/home/vscode/xnef-data2
-      # - cns-volume:/home/vscode/cns
-
+      # Keep nvidia driver mount
+      - /run/nvidia:/run/nvidia:ro
+      # Keep tmpfs mount
+      - type: tmpfs
+        target: /dev/shm
+        tmpfs:
+          size: 1g
+    entrypoint: ["/usr/local/bin/entrypoint_wrapper.sh"]
     devices:
       - /dev/fuse
     cap_add:
       - SYS_ADMIN
     security_opt:
       - apparmor:unconfined
-      # - seccomp=unconfined # Removed to match previous version
-    entrypoint: /usr/local/bin/entrypoint_wrapper.sh
     command: sleep infinity
     environment:
       - NVIDIA_DISABLE_REQUIRE=true
       - NVIDIA_VISIBLE_DEVICES=all
-    env_file:
-      - ../.env
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              capabilities: [gpu]
-
-# volumes:
-#   vermeer-volume:
-#     driver: vieux/sshfs
-#     driver_opts:
-#       sshcmd: yuki1209@ncd-node01g:/home/vermeer/yuki1209
-#       IdentityFile: /home/vscode/.ssh/id_rsa
-#       allow_other: ""
-#       uid: "1001"
-#       gid: "1001"
-#       LogLevel: DEBUG3
+              capabilities: [ gpu ]

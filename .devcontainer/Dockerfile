@@ -35,6 +35,7 @@ ENV LC_ALL en_US.UTF-8
 
 # Install essential packages, sudo, git, SSH client, curl, etc.
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    sudo \
     git \
     build-essential \
     sshfs \
@@ -48,6 +49,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev \
     libsdl1.2-dev libsmpeg-dev libportmidi-dev ffmpeg libswscale-dev \
     libavformat-dev libavcodec-dev swig \
+    zsh \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -176,7 +178,7 @@ RUN /opt/conda/envs/r_env/bin/Rscript -e "source('/tmp/anovakun_489.txt', encodi
 # RUN conda create -y -p /opt/conda/envs/torch_gpu python=3.11
 # # Make RUN commands use the new environment (instead of conda activate):
 # SHELL ["conda", "run", "-n", "torch_gpu", "/bin/bash", "-c"]
-# RUN conda install pytorch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 pytorch-cuda=12.4 -c pytorch -c nvidia \
+# RUN conda install pytorch==2.5.1 torchvision==0.20.1 torchaudio==2.20.1 pytorch-cuda=12.4 -c pytorch -c nvidia \
 #     && pip install -U -r /tmp/latest_requirements.txt \
 #     && conda clean -a -y
 
@@ -229,18 +231,15 @@ RUN mkdir -p ${WORK_DIR} \
     && chmod -R 755 /home/vscode \
     && chmod -R 775 ${WORK_DIR}
 
-# Set default shell to bash
-ENV SHELL=/bin/bash
-
-# Copy and set permissions for the entrypoint wrapper
-COPY entrypoint_wrapper.sh /usr/local/bin/entrypoint_wrapper.sh
-RUN chmod +x /usr/local/bin/entrypoint_wrapper.sh
-
 # Setup ssh config
 # Copy SSH config and set ownership directly
 COPY --chown=vscode:vscode ssh_config /home/vscode/.ssh/config
 # Ensure correct permissions
 RUN chmod 600 /home/vscode/.ssh/config
+
+# Copy entrypoint script and set permissions
+COPY entrypoint_wrapper.sh /usr/local/bin/entrypoint_wrapper.sh
+RUN chmod +x /usr/local/bin/entrypoint_wrapper.sh
 
 # Switch to vscode user
 USER vscode
