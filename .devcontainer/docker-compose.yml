@@ -2,14 +2,7 @@ name: ds-env-devcontainer
 
 services:
   workspace:
-    image: ghcr.io/yukisakai1209/ds-env:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        USER_UID: "1001"
-        USER_GID: "1001"
-        USERNAME: vscode
+    image: ghcr.io/yukisakai1209/ds-env:250421 # Use date-tagged, manually built image. Update manually when needed.
     runtime: nvidia
     env_file:
       - ../.env
