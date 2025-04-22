@@ -2,7 +2,7 @@ name: ds-env-devcontainer
 
 services:
   workspace:
-    image: ghcr.io/yukisakai1209/ds-env:250421 # Use date-tagged, manually built image. Update manually when needed.
+    image: ghcr.io/yukisakai1209/ds-env:250422 # Use date-tagged, manually built image. Update manually when needed.
     runtime: nvidia
     env_file:
       - ../.env
@@ -16,7 +16,7 @@ services:
         target: /dev/shm
         tmpfs:
           size: 1g
-    entrypoint: ["/usr/local/bin/entrypoint_wrapper.sh"]
+    entrypoint: [ "/usr/local/bin/entrypoint_wrapper.sh" ]
     devices:
       - /dev/fuse
     cap_add:
